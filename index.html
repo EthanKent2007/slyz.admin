@@ -1,53 +1,185 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025年春季学期学生心理普查</title>
+    <title>智慧校园融合系统</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        h1 {
-            color: #333;
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
         }
 
-        p {
-            line-height: 1.6;
+        .weather-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        ul {
-            list-style-type: decimal;
-            padding-left: 20px;
+        .wind-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
         }
 
-        li {
-            margin-bottom: 10px;
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            height: 40px;
         }
 
-        a {
-            color: #007BFF;
-            text-decoration: none;
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 32px;
+            width: 32px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #f39c12;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(40px);
+        }
+
+        .status-text {
+            font-size: 24px;
+            color: #34495e;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #e74c3c;
+            background: #f9ebeb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .logo {
+            width: 60px;
+            vertical-align: middle;
+            margin-right: 15px;
+            border-radius: 50px;
+        }
+
+        .watermark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        .watermark span {
+            font-size: 30px;
+            color: rgba(0, 0, 0, 0.1);
+            transform: rotate(-30deg);
+            margin: 50px;
         }
     </style>
 </head>
-
 <body>
-    <h1>2025年春季学期学生心理普查说明</h1>
-    <p>根据上级要求，本学期开学初要进行一次全员心理测评。请各位同学在本周末完成。</p>
-    <ul>
-        <li>学生进入 <a href="https://www.psy.com.cn/m/vant/#/school/501934/student/login" target="_blank">https://www.psy.com.cn/m/vant/#/school/501934/student/login</a>，输入用户名和密码后直接点击测评即可。</li>
-        <li>用户名是学生身份证号，密码是“@出生年月日（八位数）”，例如@20070101</li>
-        <li>本测评由学生本人完成。</li>
-    </ul>
-</body>
+    <div class="watermark">
+        <span>仅供娱乐 切勿当真</span>
+        <span>仅供娱乐 切勿当真</span>
+        <span>仅供娱乐 切勿当真</span>
+        <span>仅供娱乐 切勿当真</span>
+    </div>
+    <div class="header">
+        <h1>
+            <img src="logo.png" alt="logo" class="logo">
+            东营市胜利第一中学智慧校园管理系统
+        </h1>
+        <h3>气象干预控制平台</h3>
+    </div>
 
+    <div class="weather-card">
+        <h2>实时气象监测</h2>
+        <div class="weather-info">
+            <p>当前风力：<span id="wind-speed">4级</span></p>
+            <p>风向：<span id="wind-direction">西北风</span></p>
+        </div>
+
+        <div class="wind-control">
+            <span class="status-text">大风强力阻断模式：</span>
+            <label class="switch">
+                <input type="checkbox" id="windSwitch">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="warning" id="warningMessage">
+            ⚠️ 大风强力阻断模式已启动！
+        </div>
+    </div>
+
+    <script>
+        const windSwitch = document.getElementById('windSwitch');
+        const warningMessage = document.getElementById('warningMessage');
+
+        windSwitch.addEventListener('change', function() {
+            if(this.checked) {
+                warningMessage.style.display = 'block';
+                console.log('大风已启动');
+            } else {
+                warningMessage.style.display = 'none';
+                console.log('大风已取消');
+            }
+        });
+    </script>
+</body>
 </html>
+    
